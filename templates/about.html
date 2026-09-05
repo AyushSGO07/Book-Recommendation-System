@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}BookVerse - ML Architecture{% endblock %}
+
+{% block content %}
+<div class="container section" style="padding-top: var(--space-xl); max-width: 900px;">
+    
+    <div style="margin-bottom: var(--space-2xl);">
+        <h1 class="title-hero" style="font-size: 2rem;">ML Architecture</h1>
+        <p class="subtitle-hero">Technical documentation for the BookVerse recommendation pipeline.</p>
+    </div>
+    
+    <div class="section-title">
+        <h2>Dataset Metrics</h2>
+    </div>
+    
+    <div class="arch-metrics" style="margin-bottom: var(--space-3xl);">
+        <div class="metric-item">
+            <span class="metric-value">{{ stats.total_books_in_raw | default('271,360') }}</span>
+            <span class="metric-label">Books</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-value">{{ stats.total_users_in_raw | default('278,858') }}</span>
+            <span class="metric-label">Users</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-value">{{ stats.total_ratings_in_raw | default('1,149,780') }}</span>
+            <span class="metric-label">Ratings</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-value">{{ stats.collaborative_books_count | default('679') }}</span>
+            <span class="metric-label">CF Target Items</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-value">{{ stats.sparsity | default('99.8%') }}</span>
+            <span class="metric-label">Matrix Sparsity</span>
+        </div>
+    </div>
+    
+    <div class="section-title">
+        <h2>Recommendation Pipeline</h2>
+    </div>
+    
+    <div class="arch-card">
+        <h3><i data-lucide="database" style="width: 18px; height: 18px;"></i> 1. Data Processing</h3>
+        <p>The raw dataset consists of implicit and explicit ratings. We apply thresholds to filter out noisy data, requiring a minimum of 200 ratings per user and 50 ratings per book to enter the Collaborative Filtering matrix. This aggressively reduces sparsity and ensures high-quality signal.</p>
+    </div>
+    
+    <div class="arch-card">
+        <h3><i data-lucide="grid-3x3" style="width: 18px; height: 18px;"></i> 2. User-Item Matrix</h3>
+        <p>The filtered data is transformed into a dense pivot table (User-Item Matrix). Rows represent unique books and columns represent users. The cell values are the rating scores. Unrated interactions are handled as zeros.</p>
+    </div>
+    
+    <div class="arch-card">
+        <h3><i data-lucide="git-branch" style="width: 18px; height: 18px;"></i> 3. Item-Item Collaborative Filtering</h3>
+        <p>We compute Cosine Similarity across the item vectors in the matrix. When a user requests a recommendation for Book A, the system fetches the precomputed similarity scores and returns the nearest neighbor books (Books B, C, D) in the multi-dimensional space.</p>
+    </div>
+    
+    <div class="arch-card">
+        <h3><i data-lucide="cpu" style="width: 18px; height: 18px;"></i> 4. Model Artifacts</h3>
+        <p>Similarity matrices and popularity rankings are serialized into optimized Pickle objects (<code>pt.pkl</code>, <code>similarity_scores.pkl</code>) allowing for O(1) index lookups and sub-10ms recommendation latency at inference time.</p>
+    </div>
+    
+</div>
+{% endblock %}

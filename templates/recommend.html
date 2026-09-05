@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}BookVerse - Recommender Studio{% endblock %}
+
+{% block content %}
+<div class="container section">
+    
+    <div class="studio-layout">
+        <!-- Studio Sidebar Filters -->
+        <aside class="studio-sidebar">
+            <div>
+                <h2 style="font-size: 1.25rem; margin-bottom: var(--space-xs);">Recommender Studio</h2>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Fine-tune your next discovery.</p>
+            </div>
+            
+            <div class="filter-group">
+                <div class="filter-label">Genre</div>
+                <div class="filter-options">
+                    <div class="filter-chip active">Any</div>
+                    <div class="filter-chip">Fantasy</div>
+                    <div class="filter-chip">Science Fiction</div>
+                    <div class="filter-chip">Mystery</div>
+                    <div class="filter-chip">Romance</div>
+                    <div class="filter-chip">Classics</div>
+                    <div class="filter-chip">Thriller</div>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <div class="filter-label">Mood</div>
+                <div class="filter-options">
+                    <div class="filter-chip active">Any</div>
+                    <div class="filter-chip">Dark</div>
+                    <div class="filter-chip">Emotional</div>
+                    <div class="filter-chip">Adventurous</div>
+                    <div class="filter-chip">Thoughtful</div>
+                    <div class="filter-chip">Lighthearted</div>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <div class="filter-label">Rating</div>
+                <div class="filter-options">
+                    <div class="filter-chip active">Any</div>
+                    <div class="filter-chip">4.0+</div>
+                    <div class="filter-chip">4.5+</div>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <div class="filter-label">Length</div>
+                <div class="filter-options">
+                    <div class="filter-chip active">Any</div>
+                    <div class="filter-chip">Short (< 300p)</div>
+                    <div class="filter-chip">Medium</div>
+                    <div class="filter-chip">Epic (> 600p)</div>
+                </div>
+            </div>
+            
+        </aside>
+        
+        <!-- Studio Main Area -->
+        <div class="studio-main">
+            <!-- Search / Target Book -->
+            <div style="background-color: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-lg); margin-bottom: var(--space-xl);">
+                <label class="filter-label" style="display: block; margin-bottom: var(--space-sm);">Similar to:</label>
+                <form action="/recommend" method="POST" style="display: flex; gap: var(--space-md);">
+                    <div class="search-input-wrapper" style="flex: 1;">
+                        <i data-lucide="search" class="search-icon" style="width: 18px; height: 18px;"></i>
+                        <input type="text" name="book_name" class="search-input" value="{{ selected_book }}" placeholder="Search for a book you liked..." required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Find Books</button>
+                    <button type="button" class="btn btn-outline" onclick="window.location.href='/'">
+                        <i data-lucide="shuffle" style="width: 16px; height: 16px;"></i> Surprise Me
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Results Area -->
+            {% if rec_data and rec_data.message %}
+                <div style="padding: var(--space-lg); background-color: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--star-color); border-radius: 0 var(--radius-md) var(--radius-md) 0; margin-bottom: var(--space-xl);">
+                    <p style="color: var(--text-primary);">{{ rec_data.message }}</p>
+                </div>
+            {% endif %}
+
+            {% if rec_data and rec_data.query_book %}
+                <div class="section-title" style="margin-bottom: var(--space-lg); font-size: 1.125rem;">
+                    <h3>Recommendations based on "{{ rec_data.query_book.title }}"</h3>
+                </div>
+                
+                <div class="book-grid">
+                    {% for book in rec_data.recommendations %}
+                    <div class="book-card">
+                        <div class="book-cover-container">
+                            <img src="{{ book.image }}" alt="{{ book.title }}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x270?text=No+Cover'">
+                            <div class="book-actions">
+                                <button class="bookmark-btn" onclick="addToReadingList('{{ book.title }}', '{{ book.author }}', '{{ book.image }}')" title="Add to Reading List">
+                                    <i data-lucide="bookmark" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="book-info">
+                            <div class="book-title" title="{{ book.title }}">{{ book.title }}</div>
+                            <div class="book-author" title="{{ book.author }}">{{ book.author }}</div>
+                            <div class="book-meta">
+                                <span class="text-accent" style="font-weight: 500;">{{ book.similarity_score }}% Match</span>
+                                <span>&middot;</span>
+                                <span>{{ book.genre }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% elif not (rec_data and rec_data.message) %}
+                <div class="empty-state">
+                    <i data-lucide="library" style="width: 48px; height: 48px;" class="empty-icon"></i>
+                    <h3 class="empty-title">Ready for your next read?</h3>
+                    <p>Enter a book you enjoyed above, and we'll find similar stories for you.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BookVerse{% endblock %}</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Compact Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <!-- LEFT: Brand -->
+            <a href="/" class="nav-brand">
+                <i data-lucide="book-open"></i>
+                BookVerse
+            </a>
+            
+            <!-- CENTER: Links -->
+            <div class="nav-links">
+                <a href="/" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Discover</a>
+                <a href="/explore" class="nav-link {% if request.endpoint == 'explore' %}active{% endif %}">Popular</a>
+                <a href="/explore" class="nav-link">Genres</a>
+                <a href="/recommend" class="nav-link {% if request.endpoint == 'recommend' %}active{% endif %}">My Recommendations</a>
+            </div>
+            
+            <!-- RIGHT: Actions -->
+            <div class="nav-actions">
+                <button class="icon-btn" aria-label="Search">
+                    <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+                </button>
+                <a href="/reading-list" class="icon-btn" aria-label="Reading List">
+                    <i data-lucide="bookmark" style="width: 18px; height: 18px;"></i>
+                </a>
+                <a href="/about" class="icon-btn" aria-label="Architecture">
+                    <i data-lucide="cpu" style="width: 18px; height: 18px;"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <div class="container">
+        <footer class="footer">
+            <div>&copy; 2026 BookVerse. A digital book discovery platform.</div>
+            <div style="display: flex; gap: var(--space-md);">
+                <a href="/about">ML Architecture</a>
+                <a href="https://github.com/example/bookverse" target="_blank">GitHub</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}BookVerse - Find your next great read{% endblock %}
+
+{% block content %}
+<!-- Compact Hero / Discovery Area -->
+<section class="hero container">
+    <h1 class="title-hero">Find your next great read.</h1>
+    <p class="subtitle-hero">Discover books based on what readers love, what you're already reading, and the stories you want to explore next.</p>
+    
+    <div class="search-container">
+        <form action="/recommend" method="POST" class="search-input-wrapper">
+            <i data-lucide="search" class="search-icon" style="width: 20px; height: 20px;"></i>
+            <input type="text" name="book_name" class="search-input" placeholder="Search books, authors, genres..." required autocomplete="off">
+            <div class="search-shortcut">
+                <span class="kbd">Ctrl</span>
+                <span class="kbd">K</span>
+            </div>
+        </form>
+        <div class="popular-searches">
+            <span>Popular:</span>
+            <a href="/explore?search=Fantasy">Fantasy</a> &middot;
+            <a href="/explore?search=Mystery">Mystery</a> &middot;
+            <a href="/explore?search=Science Fiction">Science Fiction</a> &middot;
+            <a href="/explore?search=Romance">Romance</a> &middot;
+            <a href="/explore?search=Classics">Classics</a>
+        </div>
+    </div>
+</section>
+
+<!-- Featured This Week -->
+<section class="section container">
+    <div class="section-title">
+        <h2>Featured this week</h2>
+    </div>
+    
+    {% if featured_picks and featured_picks|length > 0 %}
+    {% set featured = featured_picks[0] %}
+    <div class="featured-book">
+        <div class="featured-bg-blur" style="background-image: url('{{ featured.image_large }}');"></div>
+        <img src="{{ featured.image_large }}" alt="{{ featured.title }}" class="featured-cover" onerror="this.src='https://via.placeholder.com/240x360?text=No+Cover'">
+        
+        <div class="featured-content">
+            <div class="featured-tag">Editor's Pick &middot; {{ featured.genre | default('Fiction') }}</div>
+            <h3 class="featured-title">{{ featured.title }}</h3>
+            <div class="featured-author">{{ featured.author }}</div>
+            
+            <div class="book-meta" style="margin-bottom: var(--space-md);">
+                <span class="book-rating">
+                    <i data-lucide="star" style="fill: var(--star-color);"></i>
+                    {{ featured.avg_rating }}
+                </span>
+                <span>&middot;</span>
+                <span>{{ featured.num_ratings }} ratings</span>
+                <span>&middot;</span>
+                <span>{{ featured.year }}</span>
+            </div>
+            
+            <p class="featured-desc">
+                {{ featured.description | default('A captivating novel that has won the hearts of many readers. Widely acclaimed for its character development and thematic depth, this book stands out in its category.') }}
+            </p>
+            
+            <div style="display: flex; gap: var(--space-sm);">
+                <form action="/recommend" method="POST" style="display: inline;">
+                    <input type="hidden" name="book_name" value="{{ featured.title }}">
+                    <button type="submit" class="btn btn-primary">Find Similar</button>
+                </form>
+                <button class="btn btn-outline" onclick="addToReadingList('{{ featured.title }}', '{{ featured.author }}', '{{ featured.image }}')">
+                    <i data-lucide="bookmark" style="width: 16px; height: 16px;"></i> Reading List
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Popular Right Now -->
+<section class="section container">
+    <div class="section-title">
+        <h2>Popular right now</h2>
+        <a href="/explore">See all &rarr;</a>
+    </div>
+    
+    <div class="book-grid">
+        {% for book in popular_books[:6] %}
+        <div class="book-card">
+            <div class="book-cover-container">
+                <img src="{{ book.image }}" alt="{{ book.title }}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x270?text=No+Cover'">
+                <div class="book-actions">
+                    <button class="bookmark-btn" onclick="addToReadingList('{{ book.title }}', '{{ book.author }}', '{{ book.image }}')" title="Add to Reading List">
+                        <i data-lucide="bookmark" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="book-info">
+                <div class="book-title" title="{{ book.title }}">{{ book.title }}</div>
+                <div class="book-author" title="{{ book.author }}">{{ book.author }}</div>
+                <div class="book-meta">
+                    <span class="book-rating">
+                        <i data-lucide="star"></i> {{ book.avg_rating }}
+                    </span>
+                    <span>&middot;</span>
+                    <span>{{ book.genre }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Picked for you -->
+<section class="section container" style="padding-bottom: var(--space-3xl);">
+    <div class="section-title">
+        <h2>Picked for you</h2>
+        <span style="font-size: 0.875rem; color: var(--text-secondary); font-weight: normal;">Based on what readers with similar tastes enjoyed.</span>
+    </div>
+    
+    <div class="book-grid">
+        {% for book in featured_picks[1:7] %}
+        <div class="book-card">
+            <div class="book-cover-container">
+                <img src="{{ book.image }}" alt="{{ book.title }}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x270?text=No+Cover'">
+                <div class="book-actions">
+                    <button class="bookmark-btn" onclick="addToReadingList('{{ book.title }}', '{{ book.author }}', '{{ book.image }}')" title="Add to Reading List">
+                        <i data-lucide="bookmark" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="book-info">
+                <div class="book-title" title="{{ book.title }}">{{ book.title }}</div>
+                <div class="book-author" title="{{ book.author }}">{{ book.author }}</div>
+                <div class="book-meta">
+                    <span class="book-rating">
+                        <i data-lucide="star"></i> {{ book.avg_rating }}
+                    </span>
+                    <span>&middot;</span>
+                    <span>{{ book.genre }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

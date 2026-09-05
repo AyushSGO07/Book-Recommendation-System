@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}BookVerse - Explore Catalog{% endblock %}
+
+{% block content %}
+<div class="container section" style="padding-top: var(--space-xl);">
+    
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md);">
+        <div>
+            <h1 class="title-hero" style="font-size: 2rem; margin-bottom: var(--space-xs);">Explore Catalog</h1>
+            <p class="subtitle-hero" style="font-size: 1rem;">Explore {{ total | default(271360) }} books</p>
+        </div>
+        
+        <form action="/explore" method="GET" style="display: flex; gap: var(--space-sm);">
+            <div class="search-input-wrapper">
+                <i data-lucide="search" class="search-icon" style="width: 16px; height: 16px;"></i>
+                <input type="text" name="search" class="search-input" style="padding: 0.5rem 1rem 0.5rem 2.5rem; max-width: 200px;" value="{{ request.args.get('search', '') }}" placeholder="Search catalog...">
+            </div>
+            
+            <!-- Pseudo dropdowns for visual structure -->
+            <select class="search-input" style="padding: 0.5rem 1rem; width: auto; appearance: auto; background-color: transparent; color: var(--text-secondary);">
+                <option>Genre: All</option>
+                <option>Fantasy</option>
+                <option>Science Fiction</option>
+                <option>Mystery</option>
+            </select>
+            
+            <select class="search-input" style="padding: 0.5rem 1rem; width: auto; appearance: auto; background-color: transparent; color: var(--text-secondary);">
+                <option>Sort: Relevance</option>
+                <option>Highest Rated</option>
+                <option>Newest</option>
+            </select>
+            
+            <button type="submit" class="btn btn-outline">Apply</button>
+        </form>
+    </div>
+    
+    <div class="section-divider" style="margin-top: 0;"></div>
+
+    <div class="book-grid">
+        {% for book in books %}
+        <div class="book-card">
+            <div class="book-cover-container">
+                <img src="{{ book.image }}" alt="{{ book.title }}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x270?text=No+Cover'">
+                <div class="book-actions">
+                    <button class="bookmark-btn" onclick="addToReadingList('{{ book.title }}', '{{ book.author }}', '{{ book.image }}')" title="Add to Reading List">
+                        <i data-lucide="bookmark" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="book-info">
+                <div class="book-title" title="{{ book.title }}">{{ book.title }}</div>
+                <div class="book-author" title="{{ book.author }}">{{ book.author }}</div>
+                <div class="book-meta">
+                    <span class="book-rating">
+                        <i data-lucide="star"></i> {{ book.avg_rating }}
+                    </span>
+                    <span>&middot;</span>
+                    <span>{{ book.genre }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pages > 1 %}
+    <div style="display: flex; justify-content: center; align-items: center; gap: var(--space-md); margin-top: var(--space-3xl);">
+        {% if page > 1 %}
+            <a href="/explore?page={{ page - 1 }}{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}" class="btn btn-outline">
+                <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i> Previous
+            </a>
+        {% endif %}
+        
+        <span style="font-size: 0.875rem; color: var(--text-secondary);">Page {{ page }} of {{ pages }}</span>
+        
+        {% if page < pages %}
+            <a href="/explore?page={{ page + 1 }}{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}" class="btn btn-outline">
+                Next <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

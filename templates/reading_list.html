@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}BookVerse - My Reading List{% endblock %}
+
+{% block content %}
+<div class="container section" style="padding-top: var(--space-xl);">
+    
+    <div style="margin-bottom: var(--space-xl);">
+        <h1 class="title-hero" style="font-size: 2rem;">Reading List</h1>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active">Want to Read</div>
+        <div class="tab">Currently Reading</div>
+        <div class="tab">Finished</div>
+    </div>
+    
+    <div id="reading-list-container">
+        <!-- JS will populate this -->
+        <div class="empty-state">
+            <i data-lucide="book-bookmark" style="width: 48px; height: 48px;" class="empty-icon"></i>
+            <h3 class="empty-title">Your reading list is empty.</h3>
+            <p style="margin-bottom: var(--space-xl);">Save books you want to remember.</p>
+            <a href="/explore" class="btn btn-primary">Explore books</a>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        loadReadingList();
+    });
+
+    function loadReadingList() {
+        const listContainer = document.getElementById('reading-list-container');
+        let readingList = JSON.parse(localStorage.getItem('reading_list') || '[]');
+        
+        if (readingList.length === 0) {
+            // Keep the empty state HTML
+            return;
+        }
+        
+        let html = '<div class="book-grid">';
+        readingList.forEach(book => {
+            html += `
+                <div class="book-card" style="background-color: var(--bg-surface); padding-bottom: var(--space-sm); border-radius: var(--radius-sm);">
+                    <div class="book-cover-container">
+                        <img src="${book.image}" alt="${book.title}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x270?text=No+Cover'">
+                    </div>
+                    <div class="book-info" style="padding: var(--space-xs) 0;">
+                        <div class="book-title" title="${book.title}">${book.title}</div>
+                        <div class="book-author" title="${book.author}">${book.author}</div>
+                        
+                        <div style="display: flex; gap: var(--space-xs); margin-top: var(--space-sm);">
+                            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.75rem; flex: 1;">
+                                <i data-lucide="check" style="width: 12px; height: 12px;"></i> Read
+                            </button>
+                            <button class="btn btn-ghost" style="padding: 4px; color: #ef4444;" onclick="removeFromReadingList('${book.title}')" title="Remove">
+                                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        listContainer.innerHTML = html;
+        lucide.createIcons();
+    }
+
+    function removeFromReadingList(title) {
+        let readingList = JSON.parse(localStorage.getItem('reading_list') || '[]');
+        readingList = readingList.filter(book => book.title !== title);
+        localStorage.setItem('reading_list', JSON.stringify(readingList));
+        loadReadingList();
+    }
+</script>
+{% endblock %}
